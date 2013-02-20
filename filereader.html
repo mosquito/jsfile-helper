@@ -1,0 +1,43 @@
+<html>
+	<head>
+		<script src="filereader.js"></script>
+	</head>
+	<body>
+		<div id='filelist'>
+			<div id='filelist-fileselect-wrap' style='font-size: 15px; font-family: Arial;'>
+				<input type="file" id="filelist-selector" name="files[]" multiple/>
+			</div>
+			<div id="filelist-progress"></div>
+			<script>
+				var filelist = new FileSelect({
+					selector: document.getElementById('filelist-selector'),
+					progress: document.getElementById('filelist-progress')
+				});
+
+				filelist.addEventListener('chunk_read', function (ev) {
+					console.log(ev);
+				});
+
+				filelist.addEventListener('change', function (ev) {
+					document.getElementById('filelist-selector').setAttribute('disabled', '');
+					var reset=document.createElement('span');
+					reset.innerHTML = 'Сбросить';
+					reset.style.cursor = 'pointer';
+					reset.id = 'filelist-reset';
+
+					reset.onclick = function (el) {
+						var selector = document.getElementById('filelist-selector')
+						selector.removeAttribute('disabled');
+						selector.value = null;
+
+						document.getElementById('filelist-fileselect-wrap').removeChild(this);
+					};
+
+					document.getElementById('filelist-fileselect-wrap').appendChild(reset);
+
+
+				});
+			</script>
+		</div>
+	</body>
+</html>
