@@ -1,7 +1,16 @@
 <html>
 	<head>
 		<script src="filereader.js"></script>
+        <style>
+            #filelist {
+                border: 2px inset;
+                border-radius: 3px;
+                width: 280px;
+                padding: 5px;
+            }
+        </style>
 	</head>
+
 	<body>
 		<div id='filelist'>
 			<div id='filelist-fileselect-wrap' style='font-size: 15px; font-family: Arial;'>
@@ -18,10 +27,58 @@
 					console.log(ev);
 				});
 
+                var output = document.getElementById('filelist-progress');
+                output.add = function (name) {
+                    var f = document.createElement('div');
+                    f.style.padding = 3+'px';
+                    f.id = 'file_progress_id_'+name;
+                    var label = document.createElement('span');
+                    label.innerHTML = name;
+                    label.id = 'file_progress_id_span_'+name;
+                    f.appendChild(label);
+                    this.appendChild(f);
+
+                    var progressBar = document.createElement('div');
+                    progressBar.id = 'file_progress_id_progressbar_'+name;
+                    progressBar.style.width = 275+'px';
+                    progressBar.style.height = 5+'px';
+                    progressBar.style.border = '1px solid black';
+                    progressBar.style.background = 'white';
+                    progressBar.painted = document.createElement('div');
+                    progressBar.painted.style.width = 0+'px';
+                    progressBar.painted.style.height = progressBar.style.height;
+                    progressBar.painted.style.border = 'none';
+                    progressBar.painted.style.background = '#0000FF';
+                    progressBar.appendChild(progressBar.painted);
+
+                    progressBar.progress = function (percent, seter) {
+                        var max = parseInt(this.style.width);
+                        var cur = parseInt(parseInt(this.painted.style.width)/(max/100));
+                        var add = percent || 0;
+
+                        if (!seter) {
+                            var t = parseInt((cur + add) * (max/100));
+                        } else {
+                            var t = parseInt((add) * (max/100));
+                        }
+                        t = t<max?t:max;
+                        this.painted.style.width = t + 'px';
+                    };
+
+                    this.appendChild(progressBar);
+                };
+
+                filelist.addEventListener('change', function (ev) {
+                    var output = document.getElementById('filelist-progress');
+                    for (var i=0; i < ev.target.files.length; i++) {
+                        output.add(ev.target.files[i].name);
+                    }
+                });
+
 				filelist.addEventListener('change', function (ev) {
 					document.getElementById('filelist-selector').setAttribute('disabled', '');
-					var reset=document.createElement('span');
-					reset.innerHTML = 'Сбросить';
+					var reset=document.createElement('button');
+					reset.innerHTML = 'X';
 					reset.style.cursor = 'pointer';
 					reset.id = 'filelist-reset';
 
@@ -29,13 +86,12 @@
 						var selector = document.getElementById('filelist-selector')
 						selector.removeAttribute('disabled');
 						selector.value = null;
+                        document.getElementById('filelist-progress').innerHTML = '';
 
 						document.getElementById('filelist-fileselect-wrap').removeChild(this);
 					};
 
 					document.getElementById('filelist-fileselect-wrap').appendChild(reset);
-
-
 				});
 			</script>
 		</div>

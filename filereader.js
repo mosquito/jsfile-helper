@@ -7,7 +7,7 @@
 			close: true,
 			file: undefined,
 			reader: undefined,
-			last_chunk: 0,
+			last_chunk: 0
 		};
 
 		self.events = {
@@ -52,7 +52,7 @@
 			} else {
 				throw (self.public.EXCEPTIONS.UNKNOWN_EVENT);
 			}
-		}
+		};
 
 		self.public.removeEventListener = function (ev, index) {
 			if (self.event_types.indexOf(ev) != -1) {
@@ -64,7 +64,7 @@
 			} else {
 				throw (self.public.EXCEPTIONS.UNKNOWN_EVENT);
 			}
-		}
+		};
 
 		self.public.events_list = [];
 		for (var evtype in self.events) self.public.events_list.push(evtype);
@@ -104,7 +104,7 @@
 					self.currentReader.reader.onload = function (ev) {
 						self.public.lastChunk = ev;
 						self.eventsRun('chunk_read', ev);
-					}
+					};
 					self.currentReader.file = self.files[filename];
 					self.currentReader.chunk_size = chunk_size || 512;
 					self.eventsRun('start_read', filename);
@@ -117,7 +117,7 @@
 				throw (self.public.EXCEPTIONS.UNKNOWN_FILE);
 				return false;
 			}
-		}
+		};
 
 		self.public.getChunk = function () {
 			if (!self.currentReader.close) {
@@ -129,7 +129,7 @@
 			} else {
 				throw (self.public.EXCEPTIONS.FILE_CLOSE);
 			}
-		}
+		};
 
 		self.public.nextChunk = function () {
 			if (self.public.lastChunk.loaded == 0 && self.public.lastChunk.total == 0) {
@@ -137,7 +137,7 @@
 				return self.currentReader.reset();
 			}
 			self.currentReader.last_chunk = self.currentReader.last_chunk + self.currentReader.chunk_size;
-		}
+		};
 
 		return self.public;
 	}
