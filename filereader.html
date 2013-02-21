@@ -3,10 +3,50 @@
 		<script src="filereader.js"></script>
         <style>
             #filelist {
-                border: 2px inset;
+                border: 1px solid rgba(0,0,0,0.2);
                 border-radius: 3px;
-                width: 280px;
+                min-width: 280px;
+                width: 99%;
                 padding: 5px;
+                background: #CCCCCC;
+                -moz-user-select: none; 
+                -khtml-user-select: none; 
+                -webkit-user-select: none; 
+                -o-user-select: none; 
+            }
+
+            .filelist-progress-wrap {
+                border: 1px #EEEEEE solid;
+                border-radius: 3px;
+                padding: 3px;
+                margin: 2px;
+                margin-top: 5px;
+                margin-bottom: 5px;
+                background: #EEEEEE;
+                box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            }
+
+            .file_progress_progressbar_painted {
+                background-image: linear-gradient(left , #2D5683 0%, #6592BE 100%);
+                background-image: -o-linear-gradient(left , #2D5683 0%, #6592BE 100%);
+                background-image: -moz-linear-gradient(left , #2D5683 0%, #6592BE 100%);
+                background-image: -webkit-linear-gradient(left , #2D5683 0%, #6592BE 100%);
+                background-image: -ms-linear-gradient(left , #2D5683 0%, #6592BE 100%);
+
+                background-image: -webkit-gradient(
+                    linear,
+                    left top,
+                    right top,
+                    color-stop(0, #2D5683),
+                    color-stop(1, #6592BE)
+                );
+            }
+
+            .filelist-progress-wrap:last-child {
+                margin-bottom: 2px;
+            }
+            .filelist-progress-wrap:first-child {
+                margin-top: 2px;
             }
         </style>
 	</head>
@@ -30,42 +70,67 @@
                 var output = document.getElementById('filelist-progress');
                 output.add = function (name) {
                     var f = document.createElement('div');
+                    var wrap = document.createElement('div');
+                    wrap.setAttribute('class', 'filelist-progress-wrap');
+                    wrap.remove = function () {
+                        this.parentElement.removeChild(this);
+                    }
+
                     f.style.padding = 3+'px';
                     f.id = 'file_progress_id_'+name;
                     var label = document.createElement('span');
                     label.innerHTML = name;
                     label.id = 'file_progress_id_span_'+name;
                     f.appendChild(label);
-                    this.appendChild(f);
+                    wrap.appendChild(f);
 
                     var progressBar = document.createElement('div');
                     progressBar.id = 'file_progress_id_progressbar_'+name;
-                    progressBar.style.width = 275+'px';
-                    progressBar.style.height = 5+'px';
+                    progressBar.setAttribute('class', 'file_progress_progressbar');
+                    progressBar.style.width = 99+'%';
+                    progressBar.style.height = 15+'px';
                     progressBar.style.border = '1px solid black';
+                    progressBar.style.borderRadius = '3px';
                     progressBar.style.background = 'white';
+                    progressBar.style.fontFamily = 'Verdana';
+                    progressBar.style.fontSize = '12px';
+                    progressBar.style.color = '#FFFFFF';
                     progressBar.painted = document.createElement('div');
+                    progressBar.painted.setAttribute('class', 'file_progress_progressbar_painted');
                     progressBar.painted.style.width = 0+'px';
                     progressBar.painted.style.height = progressBar.style.height;
-                    progressBar.painted.style.border = 'none';
-                    progressBar.painted.style.background = '#0000FF';
+                    progressBar.painted.style.textAlign = 'center';
+                    if (!progressBar.painted.style.backgroundImage) {
+                        progressBar.painted.style.backgroundColor = '#0000BB';
+                    }
+                    progressBar.painted.style.borderRadius = progressBar.style.borderRadius;
                     progressBar.appendChild(progressBar.painted);
 
-                    progressBar.progress = function (percent, seter) {
-                        var max = parseInt(this.style.width);
-                        var cur = parseInt(parseInt(this.painted.style.width)/(max/100));
+                    progressBar.progress = function (percent, setter) {
+                        var cur = parseFloat(this.painted.style.width);
                         var add = percent || 0;
 
-                        if (!seter) {
-                            var t = parseInt((cur + add) * (max/100));
+                        if (!setter) {
+                            var t = parseFloat(cur + add);
                         } else {
-                            var t = parseInt((add) * (max/100));
+                            var t = parseFloat(add);
                         }
-                        t = t<max?t:max;
-                        this.painted.style.width = t + 'px';
+                        t = t<100?t:100;
+                        this.painted.style.width = t + '%';
+                        this.painted.innerHTML = Math.round(parseFloat(this.painted.style.width)) + '%';
+
+                        return t;
                     };
 
-                    this.appendChild(progressBar);
+                    progressBar.done = function () {
+                        this.parentElement.remove();
+                    }
+
+                    progressBar.addEventListener('change')
+
+                    wrap.appendChild(progressBar);
+
+                    this.appendChild(wrap);
                 };
 
                 filelist.addEventListener('change', function (ev) {
@@ -79,8 +144,7 @@
 					document.getElementById('filelist-selector').setAttribute('disabled', '');
 					var reset=document.createElement('button');
 					reset.innerHTML = 'X';
-					reset.style.cursor = 'pointer';
-					reset.id = 'filelist-reset';
+                    reset.setAttribute('id', 'filelist-selector-close-btn');
 
 					reset.onclick = function (el) {
 						var selector = document.getElementById('filelist-selector')
@@ -93,6 +157,19 @@
 
 					document.getElementById('filelist-fileselect-wrap').appendChild(reset);
 				});
+
+                filelist.addEventListener('change', function (ev) {
+                    new Send(filelist.getFilelist(), filelist);
+                });
+
+                var Send = function(files, filelist) {
+                    self = this;
+                    self.public = {};
+
+
+                    return self.public
+                };
+
 			</script>
 		</div>
 	</body>
